@@ -30,7 +30,7 @@ function main() {
   // ========================================
   Utils.initLog();
   Utils.log("╔════════════════════════════════════════╗");
-  Utils.log("║  After Effects Automation Script      ║");
+  Utils.log("║  After Effects Automation Script       ║");
   Utils.log("╚════════════════════════════════════════╝\n");
 
   // Перевірка проекту

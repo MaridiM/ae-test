@@ -1,0 +1,23 @@
+{
+  "afterfxPath": "E:/Program Files/Adobe/Adobe After Effects 2025/Support Files/AfterFX.com",
+  "projectAep": "G:/Job/test/ТЗ/TZ Collect/ТЗ JS.aep",
+  "mainJsx": "G:/Job/test/ТЗ/TZ Collect/scripts/main.jsx",
+
+  "paths": {
+    "modulesDir": "G:/Job/test/ТЗ/TZ Collect/scripts/modules"
+  },
+
+  "render": {
+    "renderComp": "Render",
+    "customizeComp": "Customize Scene",
+    "format": ".avi",
+    "outputFolder": "/output",
+    "videoFolder": "/Footage/Material",
+    "logFolder": "/logs"
+  },
+
+  "logging": {
+    "toFile": true,
+    "toConsole": true
+  }
+}

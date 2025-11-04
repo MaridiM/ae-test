@@ -1,0 +1,12 @@
+{
+  "name": "ae-runner",
+  "private": true,
+  "version": "1.0.0",
+  "description": "After Effects automation runner",
+  "scripts": {
+    "start": "node scripts/run-ae.js"
+  },
+  "dependencies": {
+    "iconv-lite": "^0.6.3"
+  }
+}
