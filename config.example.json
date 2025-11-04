@@ -1,0 +1,11 @@
+{
+  "paths": {
+    "afterEffects": "C:\\Program Files\\Adobe\\Adobe After Effects 2024\\Support Files\\AfterFX.com",
+    "project": "path/to/your/project.aep",
+    "startup": "path/to/scripts/startup.jsx",
+    "mainScript": "path/to/scripts/main.jsx"
+  },
+  "logging": {
+    "nodeLogFile": "logs/node_run.log"
+  }
+}

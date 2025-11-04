@@ -3,8 +3,10 @@
   "private": true,
   "version": "1.0.0",
   "description": "After Effects automation runner",
+  "type": "module",
   "scripts": {
-    "start": "node run-ae.js"
+    "start": "node run-ae.js",
+    "setup": "node -e \"require('fs').copyFileSync('config.example.json','config.json')\""
   },
   "dependencies": {
     "iconv-lite": "^0.6.3"

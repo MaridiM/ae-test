@@ -2,3 +2,17 @@ node_modules
 output
 logs
 Adobe After Effects Auto-Save
+
+# Config files with local paths
+config.json
+
+# Logs
+logs/
+*.log
+
+# Node modules
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
