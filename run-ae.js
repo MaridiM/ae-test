@@ -2,12 +2,12 @@ import { spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 
-// Пути
+// Paths
 const aePath = `E:\\Program Files\\Adobe\\Adobe After Effects 2025\\Support Files\\AfterFX.com`;
 const jsxPath = `G:\\Job\\test\\ТЗ\\TZ Collect\\startup.jsx`;
 const logPath = path.join(path.dirname(jsxPath), "node_run.log");
 
-// Функция запуска
+// Launch function
 function runAfterEffects() {
   console.log("=== Запуск After Effects ===");
   const args = ["-r", jsxPath];
@@ -17,7 +17,7 @@ function runAfterEffects() {
     windowsHide: false,
   });
 
-  // Потоки AE часто в CP1251 → конвертируем в UTF-8
+  // AE streams are often in CP1251, so convert to UTF-8
   const decoder = new TextDecoder("windows-1251");
 
   const writeLog = (data, type = "OUT") => {
@@ -35,7 +35,7 @@ function runAfterEffects() {
   });
 }
 
-// Точка входа
+// Entry point
 try {
   fs.writeFileSync(logPath, "=== Новый запуск ===\n", "utf8");
   runAfterEffects();

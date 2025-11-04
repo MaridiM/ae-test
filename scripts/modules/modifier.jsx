@@ -1,23 +1,23 @@
 // ============================================
-// MODIFIER MODULE - Модуль модифікації
+// MODIFIER MODULE - Modification module
 // ============================================
-// Змінює контент проекту:
-// - Заміна тексту
-// - Заміна відео
-// - Зміна кольорів, позицій, ефектів
-// - Модифікація анімації
+// Adjusts project content:
+// - Text replacement
+// - Video replacement
+// - Color, position, and effect changes
+// - Animation modifications
 // ============================================
 
 var Modifier = (function () {
   // ========================================
-  // РОБОТА З ТЕКСТОМ
+  // TEXT OPERATIONS
   // ========================================
 
   /**
-   * Замінює текст у всіх текстових шарах композиції
-   * @param {CompItem} comp - Композиція
-   * @param {string} newText - Новий текст
-   * @returns {number} Кількість змінених шарів
+   * Replaces text in every text layer of a composition
+   * @param {CompItem} comp - Composition to modify
+   * @param {string} newText - New text value
+   * @returns {number} Number of layers updated
    */
   function replaceAllText(comp, newText) {
     Utils.log("Заміна тексту в композиції: " + comp.name);
@@ -35,7 +35,7 @@ var Modifier = (function () {
             Utils.log("  Зміна тексту в шарі: " + layer.name);
             Utils.log('    Було: "' + textDocument.text + '"');
 
-            // Зберігаємо форматування, змінюємо лише текст
+            // Preserve formatting, only update the text
             textDocument.text = newText;
             textProp.setValue(textDocument);
 
@@ -60,19 +60,19 @@ var Modifier = (function () {
   }
 
   // ========================================
-  // РОБОТА З ВІДЕО
+  // VIDEO OPERATIONS
   // ========================================
 
   /**
-   * Замінює відео у прекомпозиціях
-   * @param {Array} precomps - Масив прекомпозицій
-   * @returns {number} Кількість заміненого відео
+   * Replaces videos inside precompositions
+   * @param {Array} precomps - List of precompositions
+   * @returns {number} Count of videos replaced
    */
   function replaceVideosInPrecomps(precomps) {
     Utils.log("Заміна відео в прекомпозиціях...");
     var replacedCount = 0;
 
-    // Валідація вхідних даних
+    // Validate incoming data
     if (!precomps || precomps.length === 0) {
       Utils.log("  Не знайдено прекомпозицій для заміни відео.", "WARN");
       return 0;
@@ -86,7 +86,7 @@ var Modifier = (function () {
 
       Utils.log("✓ Папка з відео знайдена: " + videoFolder.fsName);
 
-      // Обробляємо кожну прекомпозицію
+      // Process each precomposition
       for (var i = 0; i < precomps.length; i++) {
         var precompInfo = precomps[i];
 
@@ -112,8 +112,8 @@ var Modifier = (function () {
   }
 
   /**
-   * Отримує папку з відео
-   * @returns {Folder|null} Папка або null
+   * Retrieves the video folder
+   * @returns {Folder|null} Folder or null
    */
   function getVideoFolder() {
     var projectFile = app.project.file;
@@ -133,7 +133,7 @@ var Modifier = (function () {
       Utils.log("Папка з відео не знайдена!", "ERROR");
       Utils.log("  Очікуваний шлях: " + videoFolderPath, "ERROR");
 
-      // Діагностика: виводимо вміст папки проекту
+      // Diagnostics: list the project folder contents
       Utils.log("  Вміст папки проекту:", "WARN");
       var files = projectFolder.getFiles();
       for (var i = 0; i < Math.min(files.length, 10); i++) {
@@ -147,15 +147,15 @@ var Modifier = (function () {
   }
 
   /**
-   * Замінює відео в одній прекомпозиції
-   * @param {Object} precompInfo - Інформація про прекомпозицію
-   * @param {Folder} videoFolder - Папка з відео
-   * @returns {boolean} Успішність операції
+   * Replaces the video within a single precomposition
+   * @param {Object} precompInfo - Details about the precomposition
+   * @param {Folder} videoFolder - Folder containing videos
+   * @returns {boolean} Whether the operation succeeded
    */
   function replaceVideoInPrecomp(precompInfo, videoFolder) {
     var precompComp = precompInfo.comp;
 
-    // Витягуємо номер відео з назви шару
+    // Extract the video number from the layer name
     var videoNumber = extractVideoNumber(precompInfo.layerName);
     if (videoNumber === null) {
       Utils.log(
@@ -167,7 +167,7 @@ var Modifier = (function () {
       return false;
     }
 
-    // Перевіряємо наявність відеофайлу
+    // Verify that the video file exists
     var videoFileName = "Video " + videoNumber + ".mp4";
     var videoFile = new File(videoFolder.fsName + "/" + videoFileName);
 
@@ -186,15 +186,15 @@ var Modifier = (function () {
     Utils.log("    ... Відео ЗНАЙДЕНО!");
 
     try {
-      // Очищаємо прекомпозицію
+      // Clear the precomposition
       clearComposition(precompComp);
 
-      // Імпортуємо та додаємо відео
+      // Import and place the video
       var importOptions = new ImportOptions(videoFile);
       var videoItem = app.project.importFile(importOptions);
       var newLayer = precompComp.layers.add(videoItem);
 
-      // Масштабуємо для заповнення композиції
+      // Scale to fill the composition
       scaleToFit(newLayer, precompComp);
 
       Utils.log(
@@ -214,8 +214,8 @@ var Modifier = (function () {
   }
 
   /**
-   * Очищає всі шари в композиції
-   * @param {CompItem} comp - Композиція
+   * Clears every layer in a composition
+   * @param {CompItem} comp - Composition
    */
   function clearComposition(comp) {
     while (comp.numLayers > 0) {
@@ -224,9 +224,9 @@ var Modifier = (function () {
   }
 
   /**
-   * Витягує номер відео з назви шару
-   * @param {string} layerName - Назва шару
-   * @returns {number|null} Номер або null
+   * Extracts a video index from a layer name
+   * @param {string} layerName - Layer name
+   * @returns {number|null} Index or null
    */
   function extractVideoNumber(layerName) {
     var match = layerName.match(/(\d+)/);
@@ -237,9 +237,9 @@ var Modifier = (function () {
   }
 
   /**
-   * Масштабує шар для заповнення композиції
-   * @param {Layer} layer - Шар
-   * @param {CompItem} comp - Композиція
+   * Scales a layer to fill the composition
+   * @param {Layer} layer - Layer
+   * @param {CompItem} comp - Composition
    */
   function scaleToFit(layer, comp) {
     var compWidth = comp.width;
@@ -247,31 +247,31 @@ var Modifier = (function () {
     var sourceWidth = layer.source.width;
     var sourceHeight = layer.source.height;
 
-    // Обчислюємо масштаб для заповнення (cover)
+    // Calculate the scale required to cover
     var scaleX = (compWidth / sourceWidth) * 100;
     var scaleY = (compHeight / sourceHeight) * 100;
     var finalScale = Math.max(scaleX, scaleY);
 
     Utils.log("    Масштабування до " + finalScale.toFixed(2) + "%");
 
-    // Застосовуємо масштаб
+    // Apply the scale
     var scaleProperty = layer.property("Transform").property("Scale");
     scaleProperty.setValue([finalScale, finalScale]);
 
-    // Центруємо
+    // Center the layer
     var positionProperty = layer.property("Transform").property("Position");
     positionProperty.setValue([compWidth / 2, compHeight / 2]);
   }
 
   // ========================================
-  // МОДИФІКАЦІЯ ПАРАМЕТРІВ ШАРІВ
+  // LAYER PARAMETER MODIFICATION
   // ========================================
 
   /**
-   * Змінює колір мітки шару
-   * @param {Layer} layer - Шар
-   * @param {number} colorIndex - Індекс кольору (0-16)
-   * @returns {boolean} Успішність
+   * Changes a layer label color
+   * @param {Layer} layer - Layer
+   * @param {number} colorIndex - Color index (0-16)
+   * @returns {boolean} Whether the change succeeded
    */
   function changeLayerLabelColor(layer, colorIndex) {
     try {
@@ -287,11 +287,11 @@ var Modifier = (function () {
   }
 
   /**
-   * Змінює позицію шару
-   * @param {Layer} layer - Шар
-   * @param {Array} newPosition - Нова позиція [x, y]
-   * @param {number} time - Час (опціонально, для keyframe)
-   * @returns {boolean} Успішність
+   * Adjusts a layer position
+   * @param {Layer} layer - Layer
+   * @param {Array} newPosition - New position [x, y]
+   * @param {number} time - Optional time for keyframing
+   * @returns {boolean} Whether the change succeeded
    */
   function changeLayerPosition(layer, newPosition, time) {
     try {
@@ -316,11 +316,11 @@ var Modifier = (function () {
   }
 
   /**
-   * Змінює масштаб шару
-   * @param {Layer} layer - Шар
-   * @param {Array} newScale - Новий масштаб [x, y]
-   * @param {number} time - Час (опціонально)
-   * @returns {boolean} Успішність
+   * Adjusts a layer scale
+   * @param {Layer} layer - Layer
+   * @param {Array} newScale - New scale [x, y]
+   * @param {number} time - Optional time
+   * @returns {boolean} Whether the change succeeded
    */
   function changeLayerScale(layer, newScale, time) {
     try {
@@ -345,11 +345,11 @@ var Modifier = (function () {
   }
 
   /**
-   * Змінює непрозорість шару
-   * @param {Layer} layer - Шар
-   * @param {number} newOpacity - Нова непрозорість (0-100)
-   * @param {number} time - Час (опціонально)
-   * @returns {boolean} Успішність
+   * Adjusts layer opacity
+   * @param {Layer} layer - Layer
+   * @param {number} newOpacity - New opacity (0-100)
+   * @param {number} time - Optional time
+   * @returns {boolean} Whether the change succeeded
    */
   function changeLayerOpacity(layer, newOpacity, time) {
     try {
@@ -371,16 +371,16 @@ var Modifier = (function () {
   }
 
   // ========================================
-  // РОБОТА З ЕФЕКТАМИ
+  // EFFECT OPERATIONS
   // ========================================
 
   /**
-   * Змінює параметр ефекту
-   * @param {Layer} layer - Шар
-   * @param {string} effectName - Назва ефекту
-   * @param {string} parameterName - Назва параметра
-   * @param {*} newValue - Нове значення
-   * @returns {boolean} Успішність
+   * Changes an effect parameter
+   * @param {Layer} layer - Layer
+   * @param {string} effectName - Effect name
+   * @param {string} parameterName - Parameter name
+   * @param {*} newValue - New value
+   * @returns {boolean} Whether the change succeeded
    */
   function changeEffectParameter(layer, effectName, parameterName, newValue) {
     try {
@@ -413,22 +413,22 @@ var Modifier = (function () {
   }
 
   /**
-   * Змінює значення Slider Control
-   * @param {Layer} layer - Шар
-   * @param {string} effectName - Назва ефекту
-   * @param {number} newValue - Нове значення
-   * @returns {boolean} Успішність
+   * Updates a Slider Control value
+   * @param {Layer} layer - Layer
+   * @param {string} effectName - Effect name
+   * @param {number} newValue - New value
+   * @returns {boolean} Whether the change succeeded
    */
   function changeSliderValue(layer, effectName, newValue) {
     return changeEffectParameter(layer, effectName, "Slider", newValue);
   }
 
   /**
-   * Змінює колір через Color Control
-   * @param {Layer} layer - Шар
-   * @param {string} effectName - Назва ефекту
-   * @param {Array} newColor - Новий колір [R, G, B, A] (0-1)
-   * @returns {boolean} Успішність
+   * Updates the color via a Color Control
+   * @param {Layer} layer - Layer
+   * @param {string} effectName - Effect name
+   * @param {Array} newColor - New color [R, G, B, A] (0-1)
+   * @returns {boolean} Whether the change succeeded
    */
   function changeColorControl(layer, effectName, newColor) {
     try {
@@ -453,15 +453,15 @@ var Modifier = (function () {
   }
 
   // ========================================
-  // РОБОТА З ТАЙМІНГОМ
+  // TIMING OPERATIONS
   // ========================================
 
   /**
-   * Змінює тайминг шару (in/out points)
-   * @param {Layer} layer - Шар
-   * @param {number} inPoint - Час початку (опціонально)
-   * @param {number} outPoint - Час кінця (опціонально)
-   * @returns {boolean} Успішність
+   * Adjusts layer timing (in/out points)
+   * @param {Layer} layer - Layer
+   * @param {number} inPoint - Optional start time
+   * @param {number} outPoint - Optional end time
+   * @returns {boolean} Whether the change succeeded
    */
   function changeLayerTiming(layer, inPoint, outPoint) {
     try {
@@ -483,10 +483,10 @@ var Modifier = (function () {
   }
 
   /**
-   * Змінює час початку шару
-   * @param {Layer} layer - Шар
-   * @param {number} newStartTime - Новий час початку
-   * @returns {boolean} Успішність
+   * Adjusts the layer start time
+   * @param {Layer} layer - Layer
+   * @param {number} newStartTime - New start time
+   * @returns {boolean} Whether the change succeeded
    */
   function changeLayerStartTime(layer, newStartTime) {
     try {
@@ -500,15 +500,15 @@ var Modifier = (function () {
   }
 
   // ========================================
-  // МОДИФІКАЦІЯ АНІМАЦІЇ
+  // ANIMATION MODIFICATION
   // ========================================
 
   /**
-   * Масово змінює параметри анімації
-   * @param {Layer} layer - Шар
-   * @param {string} propertyPath - Шлях до властивості (напр. "Transform")
-   * @param {Array} keyframeChanges - Масив keyframes [{time: 0, value: [0,0]}, ...]
-   * @returns {boolean} Успішність
+   * Bulk updates animation parameters
+   * @param {Layer} layer - Layer
+   * @param {string} propertyPath - Property path (e.g., "Transform")
+   * @param {Array} keyframeChanges - Keyframe array [{time: 0, value: [0,0]}, ...]
+   * @returns {boolean} Whether the change succeeded
    */
   function modifyAnimation(layer, propertyPath, keyframeChanges) {
     try {
@@ -518,12 +518,12 @@ var Modifier = (function () {
         return false;
       }
 
-      // Видаляємо старі keyframes
+      // Remove existing keyframes
       while (prop.numKeys > 0) {
         prop.removeKey(1);
       }
 
-      // Додаємо нові
+      // Add new keyframes
       for (var i = 0; i < keyframeChanges.length; i++) {
         var kf = keyframeChanges[i];
         prop.setValueAtTime(kf.time, kf.value);
@@ -545,28 +545,28 @@ var Modifier = (function () {
 
 
   return {
-    // Робота з текстом
+    // Text operations
     replaceAllText: replaceAllText,
 
-    // Робота з відео
+    // Video operations
     replaceVideosInPrecomps: replaceVideosInPrecomps,
 
-    // Модифікація параметрів
+    // Parameter modifications
     changeLayerLabelColor: changeLayerLabelColor,
     changeLayerPosition: changeLayerPosition,
     changeLayerScale: changeLayerScale,
     changeLayerOpacity: changeLayerOpacity,
 
-    // Робота з ефектами
+    // Effect operations
     changeEffectParameter: changeEffectParameter,
     changeSliderValue: changeSliderValue,
     changeColorControl: changeColorControl,
 
-    // Робота з таймінгом
+    // Timing operations
     changeLayerTiming: changeLayerTiming,
     changeLayerStartTime: changeLayerStartTime,
 
-    // Анімація
+    // Animation
     modifyAnimation: modifyAnimation,
   };
 })();

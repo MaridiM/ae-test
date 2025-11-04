@@ -1,53 +1,54 @@
 // ============================================
-// MAIN SCRIPT - Головний скрипт автоматизації
+// MAIN SCRIPT - Primary automation script
 // ============================================
 // After Effects Automation Script
-// Автоматично аналізує, модифікує та рендерить проект AE
+// Automatically analyzes, modifies, and renders the AE project
 // ============================================
 
 // ========================================
-// ПІДКЛЮЧЕННЯ МОДУЛІВ
+// MODULE IMPORTS
 // ========================================
+//@include "config.jsx"
 //@include "modules/utils.jsx"
 //@include "modules/analyzer.jsx"
 //@include "modules/modifier.jsx"
 //@include "modules/renderer.jsx"
 
 // ========================================
-// ГОЛОВНА ФУНКЦІЯ
+// MAIN FUNCTION
 // ========================================
 
 /**
- * Головна функція виконання скрипта
- * Виконує всі кроки: аналіз → модифікація → рендер
+ * Main entry point for the script
+ * Performs all steps: analysis → modification → render
  */
 function main() {
   var startTime = new Date();
-  var undoGroupStarted = false; // ВАЖЛИВО: флаг для відслідковування undo group
+  var undoGroupStarted = false; // IMPORTANT: flag for tracking the undo group
 
   // ========================================
-  // ІНІЦІАЛІЗАЦІЯ
+  // INITIALIZATION
   // ========================================
   Utils.initLog();
   Utils.log("╔════════════════════════════════════════╗");
   Utils.log("║  After Effects Automation Script       ║");
   Utils.log("╚════════════════════════════════════════╝\n");
 
-  // Перевірка проекту
+  // Project validation
   if (!Utils.checkProject()) {
     return;
   }
 
   try {
     // ========================================
-    // ШАГ 1: ПОШУК КОМПОЗИЦІЙ
+    // STEP 1: FIND COMPOSITIONS
     // ========================================
     Utils.log("\n┌─ КРОК 1: Пошук композицій ────────────┐");
 
     var renderComp = Utils.getComp(CONFIG.RENDER_COMP);
     var customizeComp = Utils.getComp(CONFIG.CUSTOMIZE_COMP);
 
-    // Валідація
+    // Validation
     if (!renderComp) {
       throw new Error("Не знайдено композицію: " + CONFIG.RENDER_COMP);
     }
@@ -60,30 +61,30 @@ function main() {
     Utils.log("└────────────────────────────────────────┘");
 
     // ========================================
-    // КРОК 2: АНАЛІЗ ЗВ'ЯЗКІВ
+    // STEP 2: CONNECTION ANALYSIS
     // ========================================
     Utils.log("\n┌─ КРОК 2: Аналіз зв'язків ─────────────┐");
 
-    // Базовий аналіз
+    // Basic analysis
     var connections = Analyzer.analyzeComposition(renderComp);
     Utils.log("  Знайдено шарів зі зв'язками: " + connections.length);
 
-    // Пошук прекомпозицій
+    // Precomposition search
     var precomps = Analyzer.findPrecomps(customizeComp);
     Utils.log("  Знайдено прекомпозицій: " + precomps.length);
 
-    // Виводимо деталі
+    // Output details
     for (var i = 0; i < precomps.length; i++) {
       Utils.log(
         "    • " + precomps[i].layerName + " → " + precomps[i].compName
       );
     }
 
-    // Детальний звіт
+    // Detailed report
     Utils.log("\n  📊 Детальний звіт:");
     var detailedReport = Analyzer.generateConnectionReport(renderComp);
 
-    // Аналіз параметрів ефектів
+    // Effect parameter analysis
     Utils.log("\n  🔍 Параметри ефектів в Customize Scene:");
     for (var i = 1; i <= customizeComp.numLayers; i++) {
       var layer = customizeComp.layer(i);
@@ -119,27 +120,27 @@ function main() {
     Utils.log("\n└────────────────────────────────────────┘");
 
     // ========================================
-    // КРОК 3: МОДИФІКАЦІЯ КОНТЕНТУ
+    // STEP 3: CONTENT MODIFICATION
     // ========================================
     Utils.log("\n┌─ КРОК 3: Модифікація контенту ────────┐");
 
-    // ПОЧИНАЄМО UNDO GROUP (тільки перед модифікацією)
+    // START THE UNDO GROUP (only before modification)
     app.beginUndoGroup("Автоматизація AE");
-    undoGroupStarted = true; // Встановлюємо флаг
+    undoGroupStarted = true; // Set the flag
 
     Utils.log("  🔄 Undo Group розпочато");
 
-    // 3.1 Заміна тексту
+    // 3.1 Text replacement
     Utils.log("\n  📝 Заміна тексту...");
     var textChanged = Modifier.replaceAllText(customizeComp, "Changed");
     Utils.log("  ✓ Змінено текстових шарів: " + textChanged);
 
-    // 3.2 Заміна відео
+    // 3.2 Video replacement
     Utils.log("\n  🎬 Заміна відео...");
     var videosReplaced = Modifier.replaceVideosInPrecomps(precomps);
     Utils.log("  ✓ Замінено відео: " + videosReplaced);
 
-    // 3.3 Додаткові модифікації (опціонально)
+    // 3.3 Additional modifications (optional)
     Utils.log("\n  🎨 Додаткові можливості:");
     Utils.log("    • Зміна кольорів (changeLayerLabelColor)");
     Utils.log("    • Зміна позицій (changeLayerPosition)");
@@ -151,21 +152,21 @@ function main() {
     Utils.log("\n└────────────────────────────────────────┘");
 
     // ========================================
-    // КРОК 4: РЕНДЕР
+    // STEP 4: RENDER
     // ========================================
     Utils.log("\n┌─ КРОК 4: Рендер ──────────────────────┐");
 
-    // Очищаємо чергу
+    // Clear the queue
     Renderer.clearRenderQueue();
 
-    // Налаштовуємо рендер
+    // Configure the render
     var renderSetup = Renderer.setupRender(renderComp);
 
     if (!renderSetup.ready) {
       throw new Error("Не вдалося налаштувати рендер: " + renderSetup.error);
     }
 
-    // Запускаємо рендер
+    // Start the render
     var renderSuccess = Renderer.startRender();
 
     if (!renderSuccess) {
@@ -174,7 +175,7 @@ function main() {
 
     Utils.log("└────────────────────────────────────────┘");
 
-    // ЗАКРИВАЄМО UNDO GROUP (тільки якщо він був відкритий)
+    // CLOSE THE UNDO GROUP (only if it was opened)
     if (undoGroupStarted) {
       app.endUndoGroup();
       undoGroupStarted = false;
@@ -182,7 +183,7 @@ function main() {
     }
 
     // ========================================
-    // ЗАВЕРШЕННЯ
+    // FINALIZATION
     // ========================================
     var endTime = new Date();
     var duration = (endTime.getTime() - startTime.getTime()) / 1000;
@@ -194,10 +195,10 @@ function main() {
     Utils.log("📁 Результат в папці: output/");
     Utils.log("📄 Логи в папці: logs/");
 
-    // Зберігаємо логи
+    // Save logs
     Utils.saveLogs();
 
-    // Фінальне повідомлення
+    // Final notification
     alert(
       "✓ Скрипт виконано успішно!\n\n" +
         "⏱  Час: " +
@@ -208,16 +209,16 @@ function main() {
     );
   } catch (error) {
     // ========================================
-    // ОБРОБКА ПОМИЛОК
+    // ERROR HANDLING
     // ========================================
 
-    // ВАЖЛИВО: закриваємо undo group ТІЛЬКИ якщо він був відкритий
+    // IMPORTANT: close the undo group ONLY if it was opened
     if (undoGroupStarted) {
       try {
         app.endUndoGroup();
         Utils.log("  🔄 Undo Group закрито через помилку", "WARN");
       } catch (undoError) {
-        // Ігноруємо помилки закриття undo group
+        // Ignore undo group closure errors
         Utils.log(
           "  ⚠ Помилка закриття Undo Group: " + undoError.toString(),
           "WARN"
@@ -234,7 +235,7 @@ function main() {
       Utils.log("📍 Рядок: " + error.line, "ERROR");
     }
 
-    // Виводимо stack trace якщо є
+    // Output stack trace if present
     if (error.stack) {
       Utils.log("\nStack trace:", "ERROR");
       Utils.log(error.stack, "ERROR");
@@ -252,10 +253,10 @@ function main() {
 }
 
 // ========================================
-// ЗАПУСК
+// EXECUTION
 // ========================================
 
-// Перевірка середовища
+// Environment check
 if (typeof app === "undefined") {
   alert("❌ Цей скрипт повинен бути запущений в Adobe After Effects!");
 } else {

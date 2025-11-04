@@ -2,6 +2,6 @@
 [ERR] *** GPU Warning: GPU3 failed (previous) sanity test ***
 [OUT] SPL-LOG-1002: starting logger thread 
 [ERR] The requested API version [22] is not available, only API versions [1, 17] are supported in this build. Current ORT Version is: 1.17.1
-[ERR] [2025-11-0[ERR] 4 16:22:41] [info] asio async_connect error: asio.system:10061 (Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение.)
-[2025-11-04 16:22:41] [info] Error getting remote endpoint: asio.system:10057 (Запрос на отправку или получение данных  (when sending on a datagram socket using a sendto call) no address was supplied.)
-[2025-11-04 16:22:41] [error] handle_connect error: Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение.
+[ERR] [2025-11-04 17:51:42] [info] asio async_connect error: asio.system:10061 (Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение.)[ERR] 
+[2025-11-04 17:51:42] [info] Error getting remote endpoint: asio.system:10057 (Запрос на отправку или получение данных  (when sending on a datagram socket using a sendto call) no address was supplied.)
+[2025-11-04 17:51:42] [error] handle_connect error: Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение.

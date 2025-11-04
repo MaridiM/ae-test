@@ -1,29 +1,29 @@
 // ============================================
-// UTILS MODULE - Утиліти та конфігурація
+// UTILS MODULE - Utilities and configuration
 // ============================================
-// Містить:
-// - Глобальні налаштування (CONFIG)
-// - Функції логування
-// - Допоміжні функції роботи з AE API
+// Contains:
+// - Global configuration (CONFIG)
+// - Logging functions
+// - Helper functions for the AE API
 // ============================================
 
 // ============================================
-// КОНФІГУРАЦІЯ ПРОЕКТА
+// PROJECT CONFIGURATION
 // ============================================
 var CONFIG = {
-  // Шляхи відносно файлу проекту
+  // Paths relative to the project file
   OUTPUT_FOLDER: "/output",
   VIDEO_FOLDER: "/Footage/Material",
   LOG_FOLDER: "/logs",
 
-  // Назви ключових композицій
+  // Key composition names
   RENDER_COMP: "Render",
   CUSTOMIZE_COMP: "Customize Scene",
 
-  // Налаштування рендера
+  // Render settings
   RENDER_FORMAT: ".avi",
 
-  // Налаштування логування
+  // Logging options
   LOG_TO_FILE: true,
   LOG_TO_CONSOLE: true,
 };
@@ -33,14 +33,14 @@ var Utils = (function () {
   var logBuffer = [];
 
   // ========================================
-  // ДОПОМІЖНІ ФУНКЦІЇ ФОРМАТУВАННЯ
+  // FORMATTING HELPERS
   // ========================================
 
   /**
-   * Додає нулі на початок числа
-   * @param {number} num - Число для форматування
-   * @param {number} size - Бажана довжина рядка
-   * @returns {string} Відформатований рядок
+   * Adds leading zeros to a number
+   * @param {number} num - Number to format
+   * @param {number} size - Desired string length
+   * @returns {string} Formatted string
    */
   function pad(num, size) {
     size = size || 2;
@@ -50,7 +50,7 @@ var Utils = (function () {
   }
 
   /**
-   * Створює timestamp для логів (ISO формат)
+   * Creates a timestamp for logs (ISO format)
    * @returns {string} YYYY-MM-DDTHH:MM:SS
    */
   function getTimestamp() {
@@ -71,7 +71,7 @@ var Utils = (function () {
   }
 
   /**
-   * Створює timestamp для імен файлів (без спецсимволів)
+   * Creates a timestamp for filenames (no special characters)
    * @returns {string} YYYYMMDD_HHMMSS
    */
   function getFileTimestamp() {
@@ -88,12 +88,12 @@ var Utils = (function () {
   }
 
   // ========================================
-  // СИСТЕМА ЛОГУВАННЯ
+  // LOGGING SYSTEM
   // ========================================
 
   /**
-   * Ініціалізує файл логів
-   * @returns {boolean} Успішність ініціалізації
+   * Initializes the log file
+   * @returns {boolean} Whether initialization succeeded
    */
   function initLog() {
     if (!CONFIG.LOG_TO_FILE) {
@@ -139,25 +139,25 @@ var Utils = (function () {
   }
 
   /**
-   * Логує повідомлення в консоль та файл
-   * @param {string} message - Повідомлення для логування
-   * @param {string} type - Тип: INFO, WARN, ERROR
-   * @returns {string} Відформатоване повідомлення
+   * Logs a message to the console and file
+   * @param {string} message - Message to log
+   * @param {string} type - Type: INFO, WARN, ERROR
+   * @returns {string} Formatted message
    */
   function log(message, type) {
     type = type || "INFO";
     var timestamp = getTimestamp();
     var logMessage = "[" + timestamp + "] [" + type + "] " + message;
 
-    // Вивід в консоль
+    // Console output
     if (CONFIG.LOG_TO_CONSOLE) {
       $.writeln(logMessage);
     }
 
-    // Зберігання в буфер
+    // Store in buffer
     logBuffer.push(logMessage);
 
-    // Запис у файл
+    // Write to file
     if (CONFIG.LOG_TO_FILE && logFile && logFile.exists) {
       try {
         if (logFile.open("a")) {
@@ -165,7 +165,7 @@ var Utils = (function () {
           logFile.close();
         }
       } catch (e) {
-        // Ігноруємо помилки запису, щоб не зациклитись
+        // Ignore write errors to avoid infinite loops
       }
     }
 
@@ -173,8 +173,8 @@ var Utils = (function () {
   }
 
   /**
-   * Зберігає фінальні логи при завершенні
-   * @returns {boolean} Успішність збереження
+   * Saves the final logs when finishing execution
+   * @returns {boolean} Whether saving succeeded
    */
   function saveLogs() {
     if (!logFile || !logFile.exists) return false;
@@ -197,12 +197,12 @@ var Utils = (function () {
   }
 
   // ========================================
-  // РОБОТА З ПРОЕКТОМ
+  // PROJECT HELPERS
   // ========================================
 
   /**
-   * Перевіряє що проект відкрито та збережено
-   * @returns {boolean} Валідність проекту
+   * Verifies that the project is open and saved
+   * @returns {boolean} Whether the project is valid
    */
   function checkProject() {
     if (!app.project) {
@@ -225,9 +225,9 @@ var Utils = (function () {
   }
 
   /**
-   * Знаходить композицію за іменем
-   * @param {string} compName - Ім'я композиції
-   * @returns {CompItem|null} Композиція або null
+   * Finds a composition by name
+   * @param {string} compName - Composition name
+   * @returns {CompItem|null} The composition or null
    */
   function getComp(compName) {
     for (var i = 1; i <= app.project.numItems; i++) {
@@ -240,10 +240,10 @@ var Utils = (function () {
   }
 
   /**
-   * Знаходить шар за іменем у композиції
-   * @param {CompItem} comp - Композиція
-   * @param {string} layerName - Ім'я шару
-   * @returns {Layer|null} Шар або null
+   * Finds a layer by name inside a composition
+   * @param {CompItem} comp - Composition
+   * @param {string} layerName - Layer name
+   * @returns {Layer|null} Layer or null
    */
   function findLayer(comp, layerName) {
     try {
@@ -254,10 +254,10 @@ var Utils = (function () {
   }
 
   /**
-   * Отримує ефект за іменем
-   * @param {Layer} layer - Шар
-   * @param {string} effectName - Ім'я ефекту
-   * @returns {Property|null} Ефект або null
+   * Retrieves an effect by name
+   * @param {Layer} layer - Layer
+   * @param {string} effectName - Effect name
+   * @returns {Property|null} Effect or null
    */
   function getEffect(layer, effectName) {
     try {
@@ -278,13 +278,13 @@ var Utils = (function () {
   }
 
   // ========================================
-  // ФАЙЛОВА СИСТЕМА
+  // FILE SYSTEM
   // ========================================
 
   /**
-   * Створює папку якщо не існує
-   * @param {string} folderPath - Шлях до папки
-   * @returns {Folder} Об'єкт папки
+   * Creates a folder if it does not exist
+   * @param {string} folderPath - Folder path
+   * @returns {Folder} Folder object
    */
   function ensureFolder(folderPath) {
     var folder = new Folder(folderPath);
@@ -299,13 +299,13 @@ var Utils = (function () {
   }
 
   // ========================================
-  // ДОПОМІЖНІ УТИЛІТИ
+  // ADDITIONAL UTILITIES
   // ========================================
 
   /**
-   * Перевіряє чи міститься значення в масиві
-   * @param {Array} arr - Масив
-   * @param {*} val - Значення
+   * Checks whether a value exists in an array
+   * @param {Array} arr - Array to search
+   * @param {*} val - Value to find
    * @returns {boolean}
    */
   function arrayContains(arr, val) {
@@ -316,21 +316,21 @@ var Utils = (function () {
   }
 
   return {
-    // Логування
+    // Logging
     log: log,
     initLog: initLog,
     saveLogs: saveLogs,
 
-    // Робота з проектом
+    // Project helpers
     checkProject: checkProject,
     getComp: getComp,
     findLayer: findLayer,
     getEffect: getEffect,
 
-    // Файлова система
+    // File system
     ensureFolder: ensureFolder,
 
-    // Утиліти
+    // Utilities
     arrayContains: arrayContains,
     getTimestamp: getTimestamp,
     getFileTimestamp: getFileTimestamp,

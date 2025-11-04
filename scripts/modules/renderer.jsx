@@ -1,51 +1,51 @@
 // ============================================
-// RENDERER MODULE - Модуль рендера
+// RENDERER MODULE - Rendering module
 // ============================================
-// Налаштовує та виконує рендер композицій
-// Експортує відео та кадри
+// Configures and runs composition renders
+// Exports videos and still frames
 // ============================================
 
 var Renderer = (function () {
   var renderQueue = app.project.renderQueue;
 
   // ========================================
-  // НАЛАШТУВАННЯ РЕНДЕРА
+  // RENDER SETUP
   // ========================================
 
   /**
-   * Налаштовує рендер для композиції
-   * @param {CompItem} comp - Композиція для рендера
-   * @returns {Object} Результат налаштування {ready, renderItem, outputPath, error}
+   * Configures render settings for a composition
+   * @param {CompItem} comp - Composition to render
+   * @returns {Object} Setup result {ready, renderItem, outputPath, error}
    */
   function setupRender(comp) {
     Utils.log("--- Налаштування рендера ---");
 
-    // Валідація
+    // Validation
     if (!comp) {
       Utils.log("Композицію не передано", "ERROR");
       return { ready: false, error: "No composition provided" };
     }
 
     try {
-      // Додаємо композицію в чергу
+      // Add the composition to the queue
       var renderItem = renderQueue.items.add(comp);
 
-      // Генеруємо шлях до вихідного файлу
+      // Generate the output path
       var outputFile = getSafeOutputPath(comp, CONFIG.RENDER_FORMAT);
 
-      // Отримуємо Output Module
+      // Fetch the output module
       var om = renderItem.outputModule(1);
 
-      // Призначаємо файл виводу
+      // Assign the output file
       om.file = outputFile;
 
-      // Застосовуємо шаблон якості (якщо є)
+      // Apply a quality template when available
       applyRenderTemplate(om);
 
-      // Встановлюємо статус в QUEUED
+      // Set the status to QUEUED
       renderItem.render = true;
 
-      // Виводимо інформацію
+      // Log diagnostic information
       Utils.log("  Композиція: " + comp.name);
       Utils.log("  Розмір: " + comp.width + "x" + comp.height);
       Utils.log("  FPS: " + comp.frameRate);
@@ -65,8 +65,8 @@ var Renderer = (function () {
   }
 
   /**
-   * Застосовує шаблон рендера
-   * @param {OutputModule} om - Output Module
+   * Applies a render template
+   * @param {OutputModule} om - Output module
    */
   function applyRenderTemplate(om) {
     var templates = ["Lossless", "High Quality", "Best Settings"];
@@ -77,7 +77,7 @@ var Renderer = (function () {
         Utils.log("  Застосовано шаблон: " + templates[i]);
         return;
       } catch (e) {
-        // Пробуємо наступний шаблон
+        // Try the next template
       }
     }
 
@@ -88,17 +88,17 @@ var Renderer = (function () {
   }
 
   // ========================================
-  // ЗАПУСК РЕНДЕРА
+  // RENDER EXECUTION
   // ========================================
 
   /**
-   * Запускає рендер всієї черги
-   * @returns {boolean} Успішність рендера
+   * Starts rendering the entire queue
+   * @returns {boolean} Whether rendering succeeded
    */
   function startRender() {
     Utils.log("\n=== ЗАПУСК РЕНДЕРА ===");
 
-    // Перевірка наявності елементів
+    // Ensure there are items
     if (renderQueue.numItems === 0) {
       Utils.log("Черга рендера пуста", "ERROR");
       return false;
@@ -107,12 +107,12 @@ var Renderer = (function () {
     Utils.log("Елементів в черзі: " + renderQueue.numItems);
 
     try {
-      // Перевіряємо статус кожного елемента
+      // Check the status of each item
       for (var i = 1; i <= renderQueue.numItems; i++) {
         var item = renderQueue.item(i);
         Utils.log("  Елемент " + i + ": " + item.comp.name);
 
-        // Переконуємось що елемент готовий
+        // Ensure the item is ready
         if (item.status !== RQItemStatus.QUEUED) {
           item.render = true;
         }
@@ -120,12 +120,12 @@ var Renderer = (function () {
 
       Utils.log("\nПочинаємо рендер (це може зайняти час)...\n");
 
-      // ЗАПУСКАЄМО РЕНДЕР
+      // START THE RENDER
       renderQueue.render();
 
       Utils.log("\n✓✓✓ РЕНДЕР ЗАВЕРШЕНО ✓✓✓");
 
-      // Перевіряємо створені файли
+      // Verify the generated files
       var createdFiles = checkRenderedFiles();
       if (createdFiles.length > 0) {
         Utils.log("\nСтворено файлів: " + createdFiles.length);
@@ -146,8 +146,8 @@ var Renderer = (function () {
   }
 
   /**
-   * Перевіряє створені файли після рендера
-   * @returns {Array} Масив інформації про файли
+   * Checks the files created after rendering
+   * @returns {Array} File information array
    */
   function checkRenderedFiles() {
     var files = [];
@@ -175,14 +175,14 @@ var Renderer = (function () {
   }
 
   // ========================================
-  // ЕКСПОРТ КАДРІВ
+  // FRAME EXPORT
   // ========================================
 
   /**
-   * Експортує один кадр з композиції
-   * @param {CompItem} comp - Композиція
-   * @param {number} time - Час кадру (в секундах)
-   * @returns {RenderQueueItem|null} Render Item або null
+   * Exports a single frame from a composition
+   * @param {CompItem} comp - Composition
+   * @param {number} time - Frame time (seconds)
+   * @returns {RenderQueueItem|null} Render item or null
    */
   function exportFrame(comp, time) {
     Utils.log("Експорт кадру з: " + comp.name);
@@ -190,14 +190,14 @@ var Renderer = (function () {
     try {
       var renderItem = renderQueue.items.add(comp);
 
-      // Налаштовуємо на один кадр
+      // Configure for a single frame
       renderItem.timeSpanDuration = comp.frameDuration;
       renderItem.timeSpanStart = time || 0;
 
       var pngPath = getSafeOutputPath(comp, ".png");
       var om = renderItem.outputModule(1);
 
-      // Застосовуємо PNG шаблон
+      // Apply the PNG template
       try {
         om.applyTemplate("PNG Sequence");
       } catch (e) {
@@ -216,11 +216,11 @@ var Renderer = (function () {
   }
 
   // ========================================
-  // УПРАВЛІННЯ ЧЕРГОЮ
+  // QUEUE MANAGEMENT
   // ========================================
 
   /**
-   * Очищає чергу рендера
+   * Clears the render queue
    */
   function clearRenderQueue() {
     var count = renderQueue.numItems;
@@ -239,20 +239,20 @@ var Renderer = (function () {
   }
 
   // ========================================
-  // ДОПОМІЖНІ ФУНКЦІЇ
+  // HELPER FUNCTIONS
   // ========================================
 
   /**
-   * Генерує безпечний шлях до вихідного файлу
-   * @param {CompItem} comp - Композиція
-   * @param {string} ext - Розширення файлу
-   * @returns {File} Об'єкт файлу
+   * Generates a safe output path
+   * @param {CompItem} comp - Composition
+   * @param {string} ext - File extension
+   * @returns {File} File object
    */
   function getSafeOutputPath(comp, ext) {
     var projectFile = app.project.file;
     var baseFolder = projectFile ? projectFile.parent : Folder.desktop;
 
-    // Створюємо папку output
+    // Create the output folder
     var outputFolder = new Folder(baseFolder.fsName + CONFIG.OUTPUT_FOLDER);
     if (!outputFolder.exists) {
       if (!outputFolder.create()) {
@@ -261,7 +261,7 @@ var Renderer = (function () {
       Utils.log("Створено папку: " + outputFolder.fsName);
     }
 
-    // Генеруємо безпечне ім'я файлу
+    // Generate a safe filename
     var timestamp = Utils.getFileTimestamp();
     var safeName = comp.name.replace(/[^a-zA-Z0-9]/g, "_");
     var fileName = safeName + "_" + timestamp + (ext || "");

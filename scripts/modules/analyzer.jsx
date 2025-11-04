@@ -1,13 +1,13 @@
 // ============================================
-// ANALYZER MODULE - Модуль аналізу
+// ANALYZER MODULE - Analysis module
 // ============================================
-// Аналізує зв'язки між шарами через Expressions
-// Знаходить прекомпозиції та параметри ефектів
+// Analyzes layer links via expressions
+// Finds precompositions and effect parameters
 // ============================================
 
 var Analyzer = (function () {
   // ========================================
-  // РЕГУЛЯРНІ ВИРАЗИ ДЛЯ ПАРСИНГУ
+  // REGEX PATTERNS FOR PARSING
   // ========================================
   var PATTERNS = {
     // comp("Name").layer("Name")
@@ -26,13 +26,13 @@ var Analyzer = (function () {
   };
 
   // ========================================
-  // ОСНОВНІ ФУНКЦІЇ АНАЛІЗУ
+  // CORE ANALYSIS FUNCTIONS
   // ========================================
 
   /**
-   * Аналізує всі expressions в композиції
-   * @param {CompItem} comp - Композиція для аналізу
-   * @returns {Array} Масив знайдених зв'язків
+   * Analyzes every expression inside a composition
+   * @param {CompItem} comp - Composition to analyze
+   * @returns {Array} List of detected connections
    */
   function analyzeComposition(comp) {
     Utils.log("Аналіз композиції: " + comp.name);
@@ -59,18 +59,18 @@ var Analyzer = (function () {
   }
 
   /**
-   * Аналізує окремий шар
-   * @param {Layer} layer - Шар для аналізу
-   * @returns {Array} Знайдені зв'язки
+   * Analyzes a single layer
+   * @param {Layer} layer - Layer to inspect
+   * @returns {Array} Discovered connections
    */
   function analyzeLayer(layer) {
     var connections = [];
 
     try {
-      // Рекурсивно перевіряємо всі властивості
+      // Recursively inspect every property
       connections = connections.concat(analyzeProperty(layer, layer));
 
-      // Окремо перевіряємо текстовий шар
+      // Check the text layer separately
       if (layer.property("Source Text")) {
         var textProp = layer.property("Source Text");
         if (textProp.expressionEnabled) {
@@ -92,17 +92,17 @@ var Analyzer = (function () {
   }
 
   /**
-   * Рекурсивно аналізує властивості
-   * @param {Property} prop - Властивість
-   * @param {Layer} layer - Батьківський шар
-   * @returns {Array} Знайдені зв'язки
+   * Recursively analyzes properties
+   * @param {Property} prop - Property to inspect
+   * @param {Layer} layer - Parent layer
+   * @returns {Array} Discovered connections
    */
   function analyzeProperty(prop, layer) {
     var connections = [];
     if (!prop) return connections;
 
     try {
-      // Перевіряємо наявність expression
+      // Detect expressions
       if (prop.expressionEnabled && prop.expression) {
         connections.push({
           type: "property",
@@ -112,7 +112,7 @@ var Analyzer = (function () {
         });
       }
 
-      // Рекурсивно перевіряємо вкладені властивості
+      // Recursively check nested properties
       if (prop.numProperties) {
         for (var i = 1; i <= prop.numProperties; i++) {
           connections = connections.concat(
@@ -121,20 +121,20 @@ var Analyzer = (function () {
         }
       }
     } catch (e) {
-      // Деякі властивості можуть бути недоступні - це нормально
+      // Some properties may be inaccessible — that's expected
     }
 
     return connections;
   }
 
   // ========================================
-  // ПАРСИНГ EXPRESSIONS
+  // EXPRESSION PARSING
   // ========================================
 
   /**
-   * Парсить expression та витягує всі посилання
-   * @param {string} expr - Expression код
-   * @returns {Object} Структура з посиланнями
+   * Parses an expression and extracts all references
+   * @param {string} expr - Expression code
+   * @returns {Object} Structure with references
    */
   function parseExpression(expr) {
     var result = {
@@ -147,7 +147,7 @@ var Analyzer = (function () {
     try {
       var match;
 
-      // Шукаємо comp().layer()
+      // Look for comp().layer()
       PATTERNS.compLayer.lastIndex = 0;
       while ((match = PATTERNS.compLayer.exec(expr)) !== null) {
         if (!Utils.arrayContains(result.compositions, match[1])) {
@@ -158,7 +158,7 @@ var Analyzer = (function () {
         }
       }
 
-      // Шукаємо layer()
+      // Look for layer()
       PATTERNS.layer.lastIndex = 0;
       while ((match = PATTERNS.layer.exec(expr)) !== null) {
         if (!Utils.arrayContains(result.layers, match[1])) {
@@ -166,7 +166,7 @@ var Analyzer = (function () {
         }
       }
 
-      // Шукаємо effect()
+      // Look for effect()
       PATTERNS.effect.lastIndex = 0;
       while ((match = PATTERNS.effect.exec(expr)) !== null) {
         if (!Utils.arrayContains(result.effects, match[1])) {
@@ -174,7 +174,7 @@ var Analyzer = (function () {
         }
       }
 
-      // Шукаємо .effect()("parameter")
+      // Look for .effect()("parameter")
       PATTERNS.effectParam.lastIndex = 0;
       while ((match = PATTERNS.effectParam.exec(expr)) !== null) {
         result.effectParameters.push({
@@ -190,13 +190,13 @@ var Analyzer = (function () {
   }
 
   // ========================================
-  // ПОШУК ПРЕКОМПОЗИЦІЙ
+  // PRECOMPOSITION DISCOVERY
   // ========================================
 
   /**
-   * Знаходить всі прекомпозиції в композиції
-   * @param {CompItem} comp - Композиція
-   * @returns {Array} Масив прекомпозицій
+   * Finds all precompositions within a composition
+   * @param {CompItem} comp - Composition
+   * @returns {Array} Array of precompositions
    */
   function findPrecomps(comp) {
     Utils.log("Пошук прекомпозицій в: " + comp.name);
@@ -229,13 +229,13 @@ var Analyzer = (function () {
   }
 
   // ========================================
-  // АНАЛІЗ ПАРАМЕТРІВ ЕФЕКТІВ
+  // EFFECT PARAMETER ANALYSIS
   // ========================================
 
   /**
-   * Детально аналізує параметри ефектів на шарі
-   * @param {Layer} layer - Шар
-   * @returns {Array} Масив параметрів ефектів
+   * Provides a detailed analysis of effect parameters on a layer
+   * @param {Layer} layer - Layer to analyze
+   * @returns {Array} Array of effect parameters
    */
   function analyzeEffectParameters(layer) {
     var effectParams = [];
@@ -258,7 +258,7 @@ var Analyzer = (function () {
               type: "unknown",
             };
 
-            // Визначаємо тип параметра
+            // Determine the parameter type
             if (param.matchName === "ADBE Slider Control-0001") {
               paramInfo.type = "slider";
               paramInfo.value = param.value;
@@ -274,7 +274,7 @@ var Analyzer = (function () {
 
             params.push(paramInfo);
           } catch (e) {
-            // Деякі параметри недоступні
+            // Some parameters might be unavailable
           }
         }
 
@@ -292,13 +292,13 @@ var Analyzer = (function () {
   }
 
   // ========================================
-  // ГЕНЕРАЦІЯ ЗВІТІВ
+  // REPORT GENERATION
   // ========================================
 
   /**
-   * Створює детальний звіт про зв'язки
-   * @param {CompItem} comp - Композиція
-   * @returns {Object} Структурований звіт
+   * Builds a detailed report about connections
+   * @param {CompItem} comp - Composition
+   * @returns {Object} Structured report
    */
   function generateConnectionReport(comp) {
     Utils.log("\n=== ДЕТАЛЬНИЙ ЗВІТ ПРО ЗВ'ЯЗКИ ===");
@@ -338,7 +338,7 @@ var Analyzer = (function () {
         }
       }
 
-      // Виводимо звіт
+      // Output the report
       Utils.log("Композиція: " + report.composition);
       Utils.log("Шарів зі зв'язками: " + report.layers.length);
       Utils.log("Всього з'єднань: " + report.totalConnections);
