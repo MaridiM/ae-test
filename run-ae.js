@@ -5,11 +5,11 @@ import path from "path";
 // Paths
 const aePath = `E:\\Program Files\\Adobe\\Adobe After Effects 2025\\Support Files\\AfterFX.com`;
 const jsxPath = `G:\\Job\\test\\ТЗ\\TZ Collect\\startup.jsx`;
-const logPath = path.join(path.dirname(jsxPath), "node_run.log");
+const logPath = path.join(path.dirname(jsxPath), "logs/node_run.log");
 
 // Launch function
 function runAfterEffects() {
-  console.log("=== Запуск After Effects ===");
+  console.log("=== Launching After Effects ===");
   const args = ["-r", jsxPath];
 
   const proc = spawn(aePath, args, {
@@ -31,14 +31,14 @@ function runAfterEffects() {
   proc.stderr.on("data", (d) => writeLog(d, "ERR"));
 
   proc.on("close", (code) => {
-    console.log(`\n=== AE завершил работу (код ${code}) ===`);
+    console.log(`\n=== AE finished with code ${code} ===`);
   });
 }
 
 // Entry point
 try {
-  fs.writeFileSync(logPath, "=== Новый запуск ===\n", "utf8");
+  fs.writeFileSync(logPath, "=== New launch ===\n", "utf8");
   runAfterEffects();
 } catch (err) {
-  console.error("Ошибка запуска:", err);
+  console.error("Launch error:", err);
 }

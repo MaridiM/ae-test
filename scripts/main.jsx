@@ -43,35 +43,35 @@ function main() {
     // ========================================
     // STEP 1: FIND COMPOSITIONS
     // ========================================
-    Utils.log("\n┌─ КРОК 1: Пошук композицій ────────────┐");
+    Utils.log("\n┌─ STEP 1: Finding compositions ────────┐");
 
     var renderComp = Utils.getComp(CONFIG.RENDER_COMP);
     var customizeComp = Utils.getComp(CONFIG.CUSTOMIZE_COMP);
 
     // Validation
     if (!renderComp) {
-      throw new Error("Не знайдено композицію: " + CONFIG.RENDER_COMP);
+      throw new Error("Composition not found: " + CONFIG.RENDER_COMP);
     }
     if (!customizeComp) {
-      throw new Error("Не знайдено композицію: " + CONFIG.CUSTOMIZE_COMP);
+      throw new Error("Composition not found: " + CONFIG.CUSTOMIZE_COMP);
     }
 
-    Utils.log("  ✓ Знайдено: " + renderComp.name);
-    Utils.log("  ✓ Знайдено: " + customizeComp.name);
+    Utils.log("  ✓ Found: " + renderComp.name);
+    Utils.log("  ✓ Found: " + customizeComp.name);
     Utils.log("└────────────────────────────────────────┘");
 
     // ========================================
     // STEP 2: CONNECTION ANALYSIS
     // ========================================
-    Utils.log("\n┌─ КРОК 2: Аналіз зв'язків ─────────────┐");
+    Utils.log("\n┌─ STEP 2: Analyzing connections ───────┐");
 
     // Basic analysis
     var connections = Analyzer.analyzeComposition(renderComp);
-    Utils.log("  Знайдено шарів зі зв'язками: " + connections.length);
+    Utils.log("  Found layers with connections: " + connections.length);
 
     // Precomposition search
     var precomps = Analyzer.findPrecomps(customizeComp);
-    Utils.log("  Знайдено прекомпозицій: " + precomps.length);
+    Utils.log("  Found precompositions: " + precomps.length);
 
     // Output details
     for (var i = 0; i < precomps.length; i++) {
@@ -81,20 +81,20 @@ function main() {
     }
 
     // Detailed report
-    Utils.log("\n  📊 Детальний звіт:");
+    Utils.log("\n  📊 Detailed report:");
     var detailedReport = Analyzer.generateConnectionReport(renderComp);
 
     // Effect parameter analysis
-    Utils.log("\n  🔍 Параметри ефектів в Customize Scene:");
+    Utils.log("\n  🔍 Effect parameters in Customize Scene:");
     for (var i = 1; i <= customizeComp.numLayers; i++) {
       var layer = customizeComp.layer(i);
       var effectParams = Analyzer.analyzeEffectParameters(layer);
 
       if (effectParams.length > 0) {
-        Utils.log("\n    Шар: " + layer.name);
+        Utils.log("\n    Layer: " + layer.name);
         for (var j = 0; j < effectParams.length; j++) {
           var eff = effectParams[j];
-          Utils.log("      Ефект: " + eff.effectName);
+          Utils.log("      Effect: " + eff.effectName);
 
           for (var k = 0; k < eff.parameters.length; k++) {
             var param = eff.parameters[k];
@@ -122,39 +122,39 @@ function main() {
     // ========================================
     // STEP 3: CONTENT MODIFICATION
     // ========================================
-    Utils.log("\n┌─ КРОК 3: Модифікація контенту ────────┐");
+    Utils.log("\n┌─ STEP 3: Modifying content ───────────┐");
 
     // START THE UNDO GROUP (only before modification)
-    app.beginUndoGroup("Автоматизація AE");
+    app.beginUndoGroup("AE Automation");
     undoGroupStarted = true; // Set the flag
 
-    Utils.log("  🔄 Undo Group розпочато");
+    Utils.log("  🔄 Undo Group started");
 
     // 3.1 Text replacement
-    Utils.log("\n  📝 Заміна тексту...");
+    Utils.log("\n  📝 Replacing text...");
     var textChanged = Modifier.replaceAllText(customizeComp, "Changed");
-    Utils.log("  ✓ Змінено текстових шарів: " + textChanged);
+    Utils.log("  ✓ Changed text layers: " + textChanged);
 
     // 3.2 Video replacement
-    Utils.log("\n  🎬 Заміна відео...");
+    Utils.log("\n  🎬 Replacing videos...");
     var videosReplaced = Modifier.replaceVideosInPrecomps(precomps);
-    Utils.log("  ✓ Замінено відео: " + videosReplaced);
+    Utils.log("  ✓ Replaced videos: " + videosReplaced);
 
     // 3.3 Additional modifications (optional)
-    Utils.log("\n  🎨 Додаткові можливості:");
-    Utils.log("    • Зміна кольорів (changeLayerLabelColor)");
-    Utils.log("    • Зміна позицій (changeLayerPosition)");
-    Utils.log("    • Зміна ефектів (changeEffectParameter)");
-    Utils.log("    • Зміна анімації (modifyAnimation)");
-    Utils.log("    • Зміна таймінгу (changeLayerTiming)");
-    Utils.log("    Див. приклади в docs/EXAMPLES.md");
+    Utils.log("\n  🎨 Additional features:");
+    Utils.log("    • Change colors (changeLayerLabelColor)");
+    Utils.log("    • Change positions (changeLayerPosition)");
+    Utils.log("    • Change effects (changeEffectParameter)");
+    Utils.log("    • Modify animation (modifyAnimation)");
+    Utils.log("    • Change timing (changeLayerTiming)");
+    Utils.log("    See examples in docs/EXAMPLES.md");
 
     Utils.log("\n└────────────────────────────────────────┘");
 
     // ========================================
     // STEP 4: RENDER
     // ========================================
-    Utils.log("\n┌─ КРОК 4: Рендер ──────────────────────┐");
+    Utils.log("\n┌─ STEP 4: Rendering ───────────────────┐");
 
     // Clear the queue
     Renderer.clearRenderQueue();
@@ -163,14 +163,14 @@ function main() {
     var renderSetup = Renderer.setupRender(renderComp);
 
     if (!renderSetup.ready) {
-      throw new Error("Не вдалося налаштувати рендер: " + renderSetup.error);
+      throw new Error("Failed to setup render: " + renderSetup.error);
     }
 
     // Start the render
     var renderSuccess = Renderer.startRender();
 
     if (!renderSuccess) {
-      throw new Error("Рендер завершився з помилкою");
+      throw new Error("Render failed");
     }
 
     Utils.log("└────────────────────────────────────────┘");
@@ -179,7 +179,7 @@ function main() {
     if (undoGroupStarted) {
       app.endUndoGroup();
       undoGroupStarted = false;
-      Utils.log("  🔄 Undo Group завершено");
+      Utils.log("  🔄 Undo Group completed");
     }
 
     // ========================================
@@ -189,23 +189,23 @@ function main() {
     var duration = (endTime.getTime() - startTime.getTime()) / 1000;
 
     Utils.log("\n╔════════════════════════════════════════╗");
-    Utils.log("║       ВИКОНАНО УСПІШНО ✓✓✓            ║");
+    Utils.log("║       COMPLETED SUCCESSFULLY ✓✓✓       ║");
     Utils.log("╚════════════════════════════════════════╝");
-    Utils.log("⏱  Час виконання: " + duration.toFixed(2) + " сек");
-    Utils.log("📁 Результат в папці: output/");
-    Utils.log("📄 Логи в папці: logs/");
+    Utils.log("⏱  Execution time: " + duration.toFixed(2) + " sec");
+    Utils.log("📁 Results in folder: output/");
+    Utils.log("📄 Logs in folder: logs/");
 
     // Save logs
     Utils.saveLogs();
 
     // Final notification
     alert(
-      "✓ Скрипт виконано успішно!\n\n" +
-        "⏱  Час: " +
+      "✓ Script completed successfully!\n\n" +
+        "⏱  Time: " +
         duration.toFixed(2) +
-        " сек\n" +
-        "📁 Перевірте папку output/\n" +
-        "📄 Логи в папці logs/"
+        " sec\n" +
+        "📁 Check output/ folder\n" +
+        "📄 Logs in logs/ folder"
     );
   } catch (error) {
     // ========================================
@@ -216,23 +216,23 @@ function main() {
     if (undoGroupStarted) {
       try {
         app.endUndoGroup();
-        Utils.log("  🔄 Undo Group закрито через помилку", "WARN");
+        Utils.log("  🔄 Undo Group closed due to error", "WARN");
       } catch (undoError) {
         // Ignore undo group closure errors
         Utils.log(
-          "  ⚠ Помилка закриття Undo Group: " + undoError.toString(),
+          "  ⚠ Error closing Undo Group: " + undoError.toString(),
           "WARN"
         );
       }
     }
 
     Utils.log("\n╔════════════════════════════════════════╗", "ERROR");
-    Utils.log("║        КРИТИЧНА ПОМИЛКА ✗✗✗           ║", "ERROR");
+    Utils.log("║        CRITICAL ERROR ✗✗✗              ║", "ERROR");
     Utils.log("╚════════════════════════════════════════╝", "ERROR");
-    Utils.log("❌ Помилка: " + error.toString(), "ERROR");
+    Utils.log("❌ Error: " + error.toString(), "ERROR");
 
     if (error.line) {
-      Utils.log("📍 Рядок: " + error.line, "ERROR");
+      Utils.log("📍 Line: " + error.line, "ERROR");
     }
 
     // Output stack trace if present
@@ -244,10 +244,10 @@ function main() {
     Utils.saveLogs();
 
     alert(
-      "❌ ПОМИЛКА!\n\n" +
+      "❌ ERROR!\n\n" +
         error.toString() +
         "\n\n" +
-        "Перевірте лог-файл в папці logs/ для деталей."
+        "Check log file in logs/ folder for details."
     );
   }
 }
@@ -258,7 +258,7 @@ function main() {
 
 // Environment check
 if (typeof app === "undefined") {
-  alert("❌ Цей скрипт повинен бути запущений в Adobe After Effects!");
+  alert("❌ This script must be run in Adobe After Effects!");
 } else {
   main();
 }

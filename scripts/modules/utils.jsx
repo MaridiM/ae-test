@@ -97,7 +97,7 @@ var Utils = (function () {
    */
   function initLog() {
     if (!CONFIG.LOG_TO_FILE) {
-      log("Логування в файл вимкнено");
+      log("File logging is disabled");
       return false;
     }
 
@@ -107,7 +107,7 @@ var Utils = (function () {
 
       if (!projectFile) {
         logFolderPath = Folder.desktop.fsName + CONFIG.LOG_FOLDER;
-        log("Проект не збережено, логи будуть на робочому столі", "WARN");
+        log("Project not saved, logs will be on desktop", "WARN");
       } else {
         logFolderPath = projectFile.path + CONFIG.LOG_FOLDER;
       }
@@ -126,14 +126,14 @@ var Utils = (function () {
         logFile.writeln("===========================================\n");
         logFile.close();
 
-        log("Лог-файл створено: " + logFile.fsName);
+        log("Log file created: " + logFile.fsName);
         return true;
       }
 
-      log("Не вдалося відкрити файл лога", "ERROR");
+      log("Failed to open log file", "ERROR");
       return false;
     } catch (e) {
-      log("Помилка ініціалізації лога: " + e.toString(), "ERROR");
+      log("Error initializing log: " + e.toString(), "ERROR");
       return false;
     }
   }
@@ -187,11 +187,11 @@ var Utils = (function () {
         logFile.writeln("===========================================");
         logFile.close();
 
-        $.writeln(">>> Логи збережено в: " + logFile.fsName);
+        $.writeln(">>> Logs saved to: " + logFile.fsName);
         return true;
       }
     } catch (e) {
-      $.writeln("Помилка збереження логів: " + e.toString());
+      $.writeln("Error saving logs: " + e.toString());
       return false;
     }
   }
@@ -206,21 +206,21 @@ var Utils = (function () {
    */
   function checkProject() {
     if (!app.project) {
-      log("Проект не відкрито!", "ERROR");
-      alert("Помилка: проект не відкрито!");
+      log("Project is not open!", "ERROR");
+      alert("Error: project is not open!");
       return false;
     }
 
     if (!app.project.file) {
-      log("Проект не збережено на диску", "ERROR");
+      log("Project is not saved to disk", "ERROR");
       alert(
-        "Будь ласка, збережіть проект перед запуском скрипта!\n\n" +
-          "Скрипт використовує шлях до файлу проекту для пошуку відео та створення output."
+        "Please save the project before running the script!\n\n" +
+          "The script uses the project file path to find videos and create output."
       );
       return false;
     }
 
-    log("Проект: " + app.project.file.fsName);
+    log("Project: " + app.project.file.fsName);
     return true;
   }
 
@@ -272,7 +272,7 @@ var Utils = (function () {
       }
       return null;
     } catch (e) {
-      log("Помилка отримання ефекту: " + e.toString(), "ERROR");
+      log("Error getting effect: " + e.toString(), "ERROR");
       return null;
     }
   }
@@ -290,9 +290,9 @@ var Utils = (function () {
     var folder = new Folder(folderPath);
     if (!folder.exists) {
       if (folder.create()) {
-        log("Створено папку: " + folderPath);
+        log("Created folder: " + folderPath);
       } else {
-        log("Не вдалося створити папку: " + folderPath, "ERROR");
+        log("Failed to create folder: " + folderPath, "ERROR");
       }
     }
     return folder;

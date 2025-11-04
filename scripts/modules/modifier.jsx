@@ -20,7 +20,7 @@ var Modifier = (function () {
    * @returns {number} Number of layers updated
    */
   function replaceAllText(comp, newText) {
-    Utils.log("Заміна тексту в композиції: " + comp.name);
+    Utils.log("Replacing text in composition: " + comp.name);
     var changedCount = 0;
 
     try {
@@ -32,18 +32,18 @@ var Modifier = (function () {
             var textProp = layer.property("Source Text");
             var textDocument = textProp.value;
 
-            Utils.log("  Зміна тексту в шарі: " + layer.name);
-            Utils.log('    Було: "' + textDocument.text + '"');
+            Utils.log("  Changing text in layer: " + layer.name);
+            Utils.log('    Was: "' + textDocument.text + '"');
 
             // Preserve formatting, only update the text
             textDocument.text = newText;
             textProp.setValue(textDocument);
 
-            Utils.log('    Стало: "' + newText + '"');
+            Utils.log('    Now: "' + newText + '"');
             changedCount++;
           } catch (e) {
             Utils.log(
-              "    Помилка зміни тексту в шарі " +
+              "    Error changing text in layer " +
                 layer.name +
                 ": " +
                 e.toString(),
@@ -53,7 +53,7 @@ var Modifier = (function () {
         }
       }
     } catch (e) {
-      Utils.log("Критична помилка заміни тексту: " + e.toString(), "ERROR");
+      Utils.log("Critical error replacing text: " + e.toString(), "ERROR");
     }
 
     return changedCount;
@@ -69,12 +69,12 @@ var Modifier = (function () {
    * @returns {number} Count of videos replaced
    */
   function replaceVideosInPrecomps(precomps) {
-    Utils.log("Заміна відео в прекомпозиціях...");
+    Utils.log("Replacing videos in precompositions...");
     var replacedCount = 0;
 
     // Validate incoming data
     if (!precomps || precomps.length === 0) {
-      Utils.log("  Не знайдено прекомпозицій для заміни відео.", "WARN");
+      Utils.log("  No precompositions found for video replacement.", "WARN");
       return 0;
     }
 
@@ -84,7 +84,7 @@ var Modifier = (function () {
         return 0;
       }
 
-      Utils.log("✓ Папка з відео знайдена: " + videoFolder.fsName);
+      Utils.log("✓ Video folder found: " + videoFolder.fsName);
 
       // Process each precomposition
       for (var i = 0; i < precomps.length; i++) {
@@ -96,7 +96,7 @@ var Modifier = (function () {
           }
         } catch (e) {
           Utils.log(
-            "  Помилка обробки прекомпозиції " +
+            "  Error processing precomposition " +
               precompInfo.layerName +
               ": " +
               e.toString(),
@@ -105,7 +105,7 @@ var Modifier = (function () {
         }
       }
     } catch (e) {
-      Utils.log("Критична помилка заміни відео: " + e.toString(), "ERROR");
+      Utils.log("Critical error replacing videos: " + e.toString(), "ERROR");
     }
 
     return replacedCount;
@@ -119,7 +119,7 @@ var Modifier = (function () {
     var projectFile = app.project.file;
 
     if (!projectFile) {
-      Utils.log("Проект не збережено, неможливо знайти відео", "ERROR");
+      Utils.log("Project not saved, cannot find videos", "ERROR");
       return null;
     }
 
@@ -127,14 +127,14 @@ var Modifier = (function () {
     var videoFolderPath = projectFolder.fsName + CONFIG.VIDEO_FOLDER;
     var videoFolder = new Folder(videoFolderPath);
 
-    Utils.log("Перевіряємо шлях: " + videoFolderPath);
+    Utils.log("Checking path: " + videoFolderPath);
 
     if (!videoFolder.exists) {
-      Utils.log("Папка з відео не знайдена!", "ERROR");
-      Utils.log("  Очікуваний шлях: " + videoFolderPath, "ERROR");
+      Utils.log("Video folder not found!", "ERROR");
+      Utils.log("  Expected path: " + videoFolderPath, "ERROR");
 
       // Diagnostics: list the project folder contents
-      Utils.log("  Вміст папки проекту:", "WARN");
+      Utils.log("  Project folder contents:", "WARN");
       var files = projectFolder.getFiles();
       for (var i = 0; i < Math.min(files.length, 10); i++) {
         Utils.log("    - " + files[i].name, "WARN");
@@ -159,9 +159,9 @@ var Modifier = (function () {
     var videoNumber = extractVideoNumber(precompInfo.layerName);
     if (videoNumber === null) {
       Utils.log(
-        "  Не вдалося витягти номер з назви шару: " +
+        "  Failed to extract number from layer name: " +
           precompInfo.layerName +
-          ". Пропускаємо.",
+          ". Skipping.",
         "WARN"
       );
       return false;
@@ -172,18 +172,18 @@ var Modifier = (function () {
     var videoFile = new File(videoFolder.fsName + "/" + videoFileName);
 
     Utils.log(
-      '  Шукаємо відео для шару "' +
+      '  Looking for video for layer "' +
         precompInfo.layerName +
         '": ' +
         videoFile.fsName
     );
 
     if (!videoFile.exists) {
-      Utils.log("    ... Відео НЕ ЗНАЙДЕНО. Пропускаємо.", "WARN");
+      Utils.log("    ... Video NOT FOUND. Skipping.", "WARN");
       return false;
     }
 
-    Utils.log("    ... Відео ЗНАЙДЕНО!");
+    Utils.log("    ... Video FOUND!");
 
     try {
       // Clear the precomposition
@@ -198,12 +198,12 @@ var Modifier = (function () {
       scaleToFit(newLayer, precompComp);
 
       Utils.log(
-        "    ✓ Відео додано та масштабовано в композицію: " + precompComp.name
+        "    ✓ Video added and scaled in composition: " + precompComp.name
       );
       return true;
     } catch (e) {
       Utils.log(
-        "    Помилка при заміні відео в композиції " +
+        "    Error replacing video in composition " +
           precompComp.name +
           ": " +
           e.toString(),
@@ -252,7 +252,7 @@ var Modifier = (function () {
     var scaleY = (compHeight / sourceHeight) * 100;
     var finalScale = Math.max(scaleX, scaleY);
 
-    Utils.log("    Масштабування до " + finalScale.toFixed(2) + "%");
+    Utils.log("    Scaling to " + finalScale.toFixed(2) + "%");
 
     // Apply the scale
     var scaleProperty = layer.property("Transform").property("Scale");
@@ -277,11 +277,11 @@ var Modifier = (function () {
     try {
       layer.label = colorIndex;
       Utils.log(
-        "  ✓ Змінено колір мітки шару: " + layer.name + " → " + colorIndex
+        "  ✓ Changed layer label color: " + layer.name + " → " + colorIndex
       );
       return true;
     } catch (e) {
-      Utils.log("  Помилка зміни кольору мітки: " + e.toString(), "ERROR");
+      Utils.log("  Error changing label color: " + e.toString(), "ERROR");
       return false;
     }
   }
@@ -300,17 +300,17 @@ var Modifier = (function () {
       if (time !== undefined) {
         position.setValueAtTime(time, newPosition);
         Utils.log(
-          "  ✓ Позиція змінена (keyframe): " + layer.name + " @ " + time + "s"
+          "  ✓ Position changed (keyframe): " + layer.name + " @ " + time + "s"
         );
       } else {
         position.setValue(newPosition);
         Utils.log(
-          "  ✓ Позиція змінена: " + layer.name + " → [" + newPosition + "]"
+          "  ✓ Position changed: " + layer.name + " → [" + newPosition + "]"
         );
       }
       return true;
     } catch (e) {
-      Utils.log("  Помилка зміни позиції: " + e.toString(), "ERROR");
+      Utils.log("  Error changing position: " + e.toString(), "ERROR");
       return false;
     }
   }
@@ -329,17 +329,15 @@ var Modifier = (function () {
       if (time !== undefined) {
         scale.setValueAtTime(time, newScale);
         Utils.log(
-          "  ✓ Масштаб змінено (keyframe): " + layer.name + " @ " + time + "s"
+          "  ✓ Scale changed (keyframe): " + layer.name + " @ " + time + "s"
         );
       } else {
         scale.setValue(newScale);
-        Utils.log(
-          "  ✓ Масштаб змінено: " + layer.name + " → " + newScale + "%"
-        );
+        Utils.log("  ✓ Scale changed: " + layer.name + " → " + newScale + "%");
       }
       return true;
     } catch (e) {
-      Utils.log("  Помилка зміни масштабу: " + e.toString(), "ERROR");
+      Utils.log("  Error changing scale: " + e.toString(), "ERROR");
       return false;
     }
   }
@@ -361,11 +359,11 @@ var Modifier = (function () {
         opacity.setValue(newOpacity);
       }
       Utils.log(
-        "  ✓ Прозорість змінена: " + layer.name + " → " + newOpacity + "%"
+        "  ✓ Opacity changed: " + layer.name + " → " + newOpacity + "%"
       );
       return true;
     } catch (e) {
-      Utils.log("  Помилка зміни прозорості: " + e.toString(), "ERROR");
+      Utils.log("  Error changing opacity: " + e.toString(), "ERROR");
       return false;
     }
   }
@@ -386,19 +384,19 @@ var Modifier = (function () {
     try {
       var effect = Utils.getEffect(layer, effectName);
       if (!effect) {
-        Utils.log("  Ефект не знайдено: " + effectName, "WARN");
+        Utils.log("  Effect not found: " + effectName, "WARN");
         return false;
       }
 
       var param = effect.property(parameterName);
       if (!param) {
-        Utils.log("  Параметр не знайдено: " + parameterName, "WARN");
+        Utils.log("  Parameter not found: " + parameterName, "WARN");
         return false;
       }
 
       param.setValue(newValue);
       Utils.log(
-        "  ✓ Параметр змінено: " +
+        "  ✓ Parameter changed: " +
           effectName +
           "." +
           parameterName +
@@ -407,7 +405,7 @@ var Modifier = (function () {
       );
       return true;
     } catch (e) {
-      Utils.log("  Помилка зміни параметра ефекту: " + e.toString(), "ERROR");
+      Utils.log("  Error changing effect parameter: " + e.toString(), "ERROR");
       return false;
     }
   }
@@ -434,20 +432,20 @@ var Modifier = (function () {
     try {
       var effect = Utils.getEffect(layer, effectName);
       if (!effect) {
-        Utils.log("  Ефект не знайдено: " + effectName, "WARN");
+        Utils.log("  Effect not found: " + effectName, "WARN");
         return false;
       }
 
       var colorProp = effect.property("Color");
       if (colorProp) {
         colorProp.setValue(newColor);
-        Utils.log("  ✓ Колір змінено в ефекті: " + effectName);
+        Utils.log("  ✓ Color changed in effect: " + effectName);
         return true;
       }
 
       return false;
     } catch (e) {
-      Utils.log("  Помилка зміни кольору: " + e.toString(), "ERROR");
+      Utils.log("  Error changing color: " + e.toString(), "ERROR");
       return false;
     }
   }
@@ -477,7 +475,7 @@ var Modifier = (function () {
 
       return true;
     } catch (e) {
-      Utils.log("  Помилка зміни таймінгу: " + e.toString(), "ERROR");
+      Utils.log("  Error changing timing: " + e.toString(), "ERROR");
       return false;
     }
   }
@@ -494,7 +492,7 @@ var Modifier = (function () {
       Utils.log("  ✓ Start Time: " + layer.name + " → " + newStartTime + "s");
       return true;
     } catch (e) {
-      Utils.log("  Помилка зміни start time: " + e.toString(), "ERROR");
+      Utils.log("  Error changing start time: " + e.toString(), "ERROR");
       return false;
     }
   }
@@ -514,7 +512,7 @@ var Modifier = (function () {
     try {
       var prop = layer.property(propertyPath);
       if (!prop) {
-        Utils.log("  Властивість не знайдено: " + propertyPath, "WARN");
+        Utils.log("  Property not found: " + propertyPath, "WARN");
         return false;
       }
 
@@ -530,7 +528,7 @@ var Modifier = (function () {
       }
 
       Utils.log(
-        "  ✓ Анімацію змінено: " +
+        "  ✓ Animation changed: " +
           propertyPath +
           " (" +
           keyframeChanges.length +
@@ -538,11 +536,10 @@ var Modifier = (function () {
       );
       return true;
     } catch (e) {
-      Utils.log("  Помилка зміни анімації: " + e.toString(), "ERROR");
+      Utils.log("  Error changing animation: " + e.toString(), "ERROR");
       return false;
     }
   }
-
 
   return {
     // Text operations

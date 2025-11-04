@@ -35,7 +35,7 @@ var Analyzer = (function () {
    * @returns {Array} List of detected connections
    */
   function analyzeComposition(comp) {
-    Utils.log("Аналіз композиції: " + comp.name);
+    Utils.log("Analyzing composition: " + comp.name);
     var connections = [];
 
     try {
@@ -52,7 +52,7 @@ var Analyzer = (function () {
         }
       }
     } catch (e) {
-      Utils.log("Помилка аналізу композиції: " + e.toString(), "ERROR");
+      Utils.log("Error analyzing composition: " + e.toString(), "ERROR");
     }
 
     return connections;
@@ -83,7 +83,7 @@ var Analyzer = (function () {
       }
     } catch (e) {
       Utils.log(
-        "Помилка аналізу шару " + layer.name + ": " + e.toString(),
+        "Error analyzing layer " + layer.name + ": " + e.toString(),
         "WARN"
       );
     }
@@ -183,7 +183,7 @@ var Analyzer = (function () {
         });
       }
     } catch (e) {
-      Utils.log("Помилка парсингу expression: " + e.toString(), "WARN");
+      Utils.log("Error parsing expression: " + e.toString(), "WARN");
     }
 
     return result;
@@ -199,7 +199,7 @@ var Analyzer = (function () {
    * @returns {Array} Array of precompositions
    */
   function findPrecomps(comp) {
-    Utils.log("Пошук прекомпозицій в: " + comp.name);
+    Utils.log("Searching for precompositions in: " + comp.name);
     var precomps = [];
 
     try {
@@ -214,15 +214,12 @@ var Analyzer = (function () {
             comp: layer.source,
           });
           Utils.log(
-            "  Знайдено прекомпозицію: " +
-              layer.name +
-              " -> " +
-              layer.source.name
+            "  Found precomposition: " + layer.name + " -> " + layer.source.name
           );
         }
       }
     } catch (e) {
-      Utils.log("Помилка пошуку прекомпозицій: " + e.toString(), "ERROR");
+      Utils.log("Error searching precompositions: " + e.toString(), "ERROR");
     }
 
     return precomps;
@@ -285,7 +282,7 @@ var Analyzer = (function () {
         });
       }
     } catch (e) {
-      Utils.log("Помилка аналізу параметрів ефектів: " + e.toString(), "WARN");
+      Utils.log("Error analyzing effect parameters: " + e.toString(), "WARN");
     }
 
     return effectParams;
@@ -301,7 +298,7 @@ var Analyzer = (function () {
    * @returns {Object} Structured report
    */
   function generateConnectionReport(comp) {
-    Utils.log("\n=== ДЕТАЛЬНИЙ ЗВІТ ПРО ЗВ'ЯЗКИ ===");
+    Utils.log("\n=== DETAILED CONNECTION REPORT ===");
 
     var report = {
       composition: comp.name,
@@ -339,9 +336,9 @@ var Analyzer = (function () {
       }
 
       // Output the report
-      Utils.log("Композиція: " + report.composition);
-      Utils.log("Шарів зі зв'язками: " + report.layers.length);
-      Utils.log("Всього з'єднань: " + report.totalConnections);
+      Utils.log("Composition: " + report.composition);
+      Utils.log("Layers with connections: " + report.layers.length);
+      Utils.log("Total connections: " + report.totalConnections);
 
       for (var i = 0; i < report.layers.length; i++) {
         var lr = report.layers[i];
@@ -351,15 +348,15 @@ var Analyzer = (function () {
           var expr = lr.expressions[j];
           Utils.log("    Expression: " + expr.propertyName);
           if (expr.parsed.layers.length > 0) {
-            Utils.log("      → Шари: " + expr.parsed.layers.join(", "));
+            Utils.log("      → Layers: " + expr.parsed.layers.join(", "));
           }
           if (expr.parsed.effects.length > 0) {
-            Utils.log("      → Ефекти: " + expr.parsed.effects.join(", "));
+            Utils.log("      → Effects: " + expr.parsed.effects.join(", "));
           }
         }
       }
     } catch (e) {
-      Utils.log("Помилка генерації звіту: " + e.toString(), "ERROR");
+      Utils.log("Error generating report: " + e.toString(), "ERROR");
     }
 
     return report;

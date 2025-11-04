@@ -18,11 +18,11 @@ var Renderer = (function () {
    * @returns {Object} Setup result {ready, renderItem, outputPath, error}
    */
   function setupRender(comp) {
-    Utils.log("--- Налаштування рендера ---");
+    Utils.log("--- Setting up render ---");
 
     // Validation
     if (!comp) {
-      Utils.log("Композицію не передано", "ERROR");
+      Utils.log("Composition not provided", "ERROR");
       return { ready: false, error: "No composition provided" };
     }
 
@@ -46,12 +46,12 @@ var Renderer = (function () {
       renderItem.render = true;
 
       // Log diagnostic information
-      Utils.log("  Композиція: " + comp.name);
-      Utils.log("  Розмір: " + comp.width + "x" + comp.height);
+      Utils.log("  Composition: " + comp.name);
+      Utils.log("  Size: " + comp.width + "x" + comp.height);
       Utils.log("  FPS: " + comp.frameRate);
-      Utils.log("  Тривалість: " + comp.duration.toFixed(2) + "s");
+      Utils.log("  Duration: " + comp.duration.toFixed(2) + "s");
       Utils.log("  Output: " + om.file.fsName);
-      Utils.log("  ✓ Рендер налаштовано успішно");
+      Utils.log("  ✓ Render setup successful");
 
       return {
         renderItem: renderItem,
@@ -59,7 +59,7 @@ var Renderer = (function () {
         ready: true,
       };
     } catch (e) {
-      Utils.log("Помилка налаштування рендера: " + e.toString(), "ERROR");
+      Utils.log("Error setting up render: " + e.toString(), "ERROR");
       return { ready: false, error: e.toString() };
     }
   }
@@ -74,17 +74,14 @@ var Renderer = (function () {
     for (var i = 0; i < templates.length; i++) {
       try {
         om.applyTemplate(templates[i]);
-        Utils.log("  Застосовано шаблон: " + templates[i]);
+        Utils.log("  Applied template: " + templates[i]);
         return;
       } catch (e) {
         // Try the next template
       }
     }
 
-    Utils.log(
-      "  Шаблон не знайдено, використовуємо налаштування за замовчуванням",
-      "WARN"
-    );
+    Utils.log("  Template not found, using default settings", "WARN");
   }
 
   // ========================================
@@ -96,21 +93,21 @@ var Renderer = (function () {
    * @returns {boolean} Whether rendering succeeded
    */
   function startRender() {
-    Utils.log("\n=== ЗАПУСК РЕНДЕРА ===");
+    Utils.log("\n=== STARTING RENDER ===");
 
     // Ensure there are items
     if (renderQueue.numItems === 0) {
-      Utils.log("Черга рендера пуста", "ERROR");
+      Utils.log("Render queue is empty", "ERROR");
       return false;
     }
 
-    Utils.log("Елементів в черзі: " + renderQueue.numItems);
+    Utils.log("Items in queue: " + renderQueue.numItems);
 
     try {
       // Check the status of each item
       for (var i = 1; i <= renderQueue.numItems; i++) {
         var item = renderQueue.item(i);
-        Utils.log("  Елемент " + i + ": " + item.comp.name);
+        Utils.log("  Item " + i + ": " + item.comp.name);
 
         // Ensure the item is ready
         if (item.status !== RQItemStatus.QUEUED) {
@@ -118,17 +115,17 @@ var Renderer = (function () {
         }
       }
 
-      Utils.log("\nПочинаємо рендер (це може зайняти час)...\n");
+      Utils.log("\nStarting render (this may take a while)...\n");
 
       // START THE RENDER
       renderQueue.render();
 
-      Utils.log("\n✓✓✓ РЕНДЕР ЗАВЕРШЕНО ✓✓✓");
+      Utils.log("\n✓✓✓ RENDER COMPLETE ✓✓✓");
 
       // Verify the generated files
       var createdFiles = checkRenderedFiles();
       if (createdFiles.length > 0) {
-        Utils.log("\nСтворено файлів: " + createdFiles.length);
+        Utils.log("\nCreated files: " + createdFiles.length);
         for (var i = 0; i < createdFiles.length; i++) {
           var fileInfo = createdFiles[i];
           Utils.log("  ✓ " + fileInfo.name + " (" + fileInfo.sizeMB + " MB)");
@@ -137,9 +134,9 @@ var Renderer = (function () {
 
       return true;
     } catch (e) {
-      Utils.log("ПОМИЛКА РЕНДЕРА: " + e.toString(), "ERROR");
+      Utils.log("RENDER ERROR: " + e.toString(), "ERROR");
       if (e.line) {
-        Utils.log("  Рядок: " + e.line, "ERROR");
+        Utils.log("  Line: " + e.line, "ERROR");
       }
       return false;
     }
@@ -168,7 +165,7 @@ var Renderer = (function () {
         }
       }
     } catch (e) {
-      Utils.log("Помилка перевірки файлів: " + e.toString(), "WARN");
+      Utils.log("Error checking files: " + e.toString(), "WARN");
     }
 
     return files;
@@ -185,7 +182,7 @@ var Renderer = (function () {
    * @returns {RenderQueueItem|null} Render item or null
    */
   function exportFrame(comp, time) {
-    Utils.log("Експорт кадру з: " + comp.name);
+    Utils.log("Exporting frame from: " + comp.name);
 
     try {
       var renderItem = renderQueue.items.add(comp);
@@ -201,7 +198,7 @@ var Renderer = (function () {
       try {
         om.applyTemplate("PNG Sequence");
       } catch (e) {
-        Utils.log("  PNG шаблон не знайдено", "WARN");
+        Utils.log("  PNG template not found", "WARN");
       }
 
       om.file = pngPath;
@@ -210,7 +207,7 @@ var Renderer = (function () {
       Utils.log("  Frame output: " + om.file.fsName);
       return renderItem;
     } catch (e) {
-      Utils.log("Помилка експорту кадру: " + e.toString(), "ERROR");
+      Utils.log("Error exporting frame: " + e.toString(), "ERROR");
       return null;
     }
   }
@@ -231,10 +228,10 @@ var Renderer = (function () {
       }
 
       if (count > 0) {
-        Utils.log("Чергу рендера очищено (" + count + " елементів)");
+        Utils.log("Render queue cleared (" + count + " items)");
       }
     } catch (e) {
-      Utils.log("Помилка очищення черги: " + e.toString(), "ERROR");
+      Utils.log("Error clearing queue: " + e.toString(), "ERROR");
     }
   }
 
@@ -256,9 +253,9 @@ var Renderer = (function () {
     var outputFolder = new Folder(baseFolder.fsName + CONFIG.OUTPUT_FOLDER);
     if (!outputFolder.exists) {
       if (!outputFolder.create()) {
-        throw new Error("Не вдалося створити папку output");
+        throw new Error("Failed to create output folder");
       }
-      Utils.log("Створено папку: " + outputFolder.fsName);
+      Utils.log("Created folder: " + outputFolder.fsName);
     }
 
     // Generate a safe filename
@@ -268,7 +265,7 @@ var Renderer = (function () {
 
     var filePath = Folder.decode(outputFolder.fsName + "/" + fileName);
 
-    Utils.log("  Шлях виводу: " + filePath);
+    Utils.log("  Output path: " + filePath);
 
     return new File(filePath);
   }
